@@ -26,11 +26,10 @@ def home():
 					img.save(os.path.join(app.config["IMAGE_UPLOADS"], img.filename))
 					test_img = cv2.imread(os.path.join(app.config['IMAGE_UPLOADS'], img.filename))
 
-					cv2.imshow('test_img',test_img)
 					detect_text = Detect(test_img)
 
 					if(detect_text.detect_text() ==  False):
-						flash(f'Unable to Find','danger')
+						flash(f'Some Error Occured','danger')
 					else:
 						t  = detect_text.detect_text()
 

@@ -21,7 +21,6 @@ def home():
 				if(img == None):
 					flash(f'Please choose a file','danger')
 
-
 				else:
 
 					img.save(os.path.join(app.config["IMAGE_UPLOADS"], img.filename))
@@ -29,8 +28,11 @@ def home():
 
 					cv2.imshow('test_img',test_img)
 					detect_text = Detect(test_img)
-					t  =detect_text.detect_text()
 
+					if(detect_text.detect_text() ==  False):
+						flash(f'Unable to Find','danger')
+					else:
+						t  = detect_text.detect_text()
 
 			except(FileNotFoundError):
 				flash(f'Please choose a file','danger')

@@ -12,9 +12,7 @@ def home():
 
 	if(request.method  == 'POST'):
 
-
 		if(request.files):
-
 
 			try:
 

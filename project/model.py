@@ -8,7 +8,7 @@ class Detect:
 	img = None
 
 	def __init__(self,img):
-		pytesseract.pytesseract.tesseract_cmd = r'.\project\Tesseract-OCR\tesseract'
+		pytesseract.pytesseract.tesseract_cmd = r'.\Tesseract-OCR\tesseract'
 		self.img = img
 
 	def detect_text(self):

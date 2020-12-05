@@ -34,7 +34,7 @@ def home():
 						t  = detect_text.detect_text()
 
 			except(FileNotFoundError):
-				flash(f'Some Error Occured','danger')
+				flash(f'File Not Found','danger')
 
 
 	return render_template('index.html',text = t)

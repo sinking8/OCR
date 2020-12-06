@@ -1,4 +1,4 @@
-import pytesseract
+from tensorflow import keras
 import cv2
 import numpy as np 
 import imutils
@@ -8,49 +8,51 @@ class Detect:
 	img = None
 
 	def __init__(self,img):
-		pytesseract.pytesseract.tesseract_cmd = r'.\Tesseract-OCR\tesseract'
 		self.img = img
+		self.detect_model = keras.models.load_model('./project/detect.h5')
+		self.lenet_model  = keras.models.load_model('./project/Lenet.h5')
 
 	def detect_text(self):
-
-		#Applying Filters
-		gray = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
-		edged = cv2.Canny(gray, 30, 200)
-
-		text  =  self.detect_license_plate(edged,gray)
+		text  =  self.detect_license_plate()
 		return text
 
-	def detect_license_plate(self,edged,gray):
+	def detect_license_plate(self):
 
 		try:
 
-			#Detecting Contours in the given image
-			contours=cv2.findContours(edged.copy(),cv2.RETR_TREE,
-	                                            cv2.CHAIN_APPROX_SIMPLE)
-			contours = imutils.grab_contours(contours)
-			contours = sorted(contours,key=cv2.contourArea, reverse = True)[:10]
-			screenCnt = None
+			#Generating key value pairs
+			ch  = 'A'
+			preds ={};
+			for i in range(1,27):preds[i] = chr(ord(ch) + i)
+			
+			#Applying GaussianBlur and performing Edge Detection
+			gray = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
+			blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+			edged = cv2.Canny(blurred, 50, 200, 255)
 
-			for c in contours:
-			    peri = cv2.arcLength(c, True)
-			    approx = cv2.approxPolyDP(c, 0.018 * peri, True)
-			    if len(approx) == 4:
-			        screenCnt = approx
-			        break
+			cv2.threshold(edged,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU,gray)
 
-			# Masking the part other than the number plate
-			mask = np.zeros(gray.shape,np.uint8)
-			new_image = cv2.drawContours(mask,[screenCnt],0,255,-1,)
-			new_image = cv2.bitwise_and(self.img,self.img,mask=mask)
+			#Detecting Contours
+			contours,_ = cv2.findContours(edged, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+			code = ''
 
-			# cropping
-			(x, y) = np.where(mask == 255)
-			(topx, topy) = (np.min(x), np.min(y))
-			(bottomx, bottomy) = (np.max(x), np.max(y))
-			Cropped = gray[topx:bottomx+1, topy:bottomy+1]
+			if(len(contours) !=0):
+			    for c in contours:
+
+			        x, y, w, h = cv2.boundingRect(c)     
+			        area = cv2.contourArea(c)
+			        
+			        if(area>100):        
+			            img = self.img[y:y+h,x:x+w]
+			            img = cv2.resize(img,(32,32))
+			            img = np.reshape(img,(1,32,32,3))
+			            
+			            pred  = np.argmax(self.lenet_model.predict(img), axis = -1)[0]
+			            
+			            if(pred>9):
+			                pred  = preds[pred]
+			            code  = code + ' ' + str(pred)
+			return code
 
 		except:
 			return False
-
-		else:
-			return(pytesseract.image_to_string(Cropped))

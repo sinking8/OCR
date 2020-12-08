@@ -14,7 +14,12 @@ class Detect:
 			self.lenet_model  = keras.models.load_model('./project/Lenet.h5',compile=False)
 
 		except:
-			self.lenet_model  = keras.models.load_model('Lenet.h5',compile=False)
+
+			try:
+				self.lenet_model  = keras.models.load_model('Lenet.h5',compile=False)
+
+			except:
+				self.lenet_model = tf.keras.experimental.load_from_saved_model('./project/Lenet.h5',compile=False)
 
 
 	def detect_text(self):

@@ -10,7 +10,7 @@ class Detect:
 	def __init__(self,img):
 		self.img = img
 		#self.detect_model = keras.models.load_model('./project/detect.h5',compile=False)
-		self.lenet_model  = keras.models.load_model('./project/Lenet.h5',compile=False)
+		#self.lenet_model  = keras.models.load_model('./project/Lenet.h5',compile=False)
 
 	def detect_text(self):
 		text  =  self.detect_license_plate()
@@ -35,6 +35,8 @@ class Detect:
 			#Detecting Contours
 			contours,_ = cv2.findContours(edged, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 			code = ''
+
+			return len(contours)
 
 			if(len(contours) !=0):
 			    for c in contours:

@@ -9,7 +9,7 @@ class Detect:
 
 	def __init__(self,img):
 		self.img = img
-		self.detect_model = keras.models.load_model('./project/detect.h5',compile=False)
+		#self.detect_model = keras.models.load_model('./project/detect.h5',compile=False)
 		self.lenet_model  = keras.models.load_model('./project/Lenet.h5',compile=False)
 
 	def detect_text(self):
